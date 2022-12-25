@@ -24,8 +24,5 @@ jobs:
     - name: Install LLVM
       run: sudo apt install -y llvm
 
-    - name: Build Interpreter
-      run: cd interpreter; go build -o interpreter
-
-    - name: Build Compiler
-      run: cd compiler; go build -o compiler
+    - name: Run Compiler
+      run: bash run.sh
