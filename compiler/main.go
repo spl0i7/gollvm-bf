@@ -36,7 +36,8 @@ func main() {
 
 	mod := ir.NewModule()
 
-	puts := mod.NewFunc("putchar", types.I32, ir.NewParam("", types.I32))
+	getchar := mod.NewFunc("getchar", types.I8)
+	puts := mod.NewFunc("putchar", types.I32, ir.NewParam("", types.I8))
 	memset := mod.NewFunc("memset", types.Void, ir.NewParam("p1", types.I8Ptr), ir.NewParam("p2", types.I8), ir.NewParam("p3", types.I64))
 
 	entryPoint := mod.NewFunc("main", types.I32)
@@ -76,7 +77,7 @@ func main() {
 			builder.NewStore(t1, dataPtr)
 		case '.':
 			ptr := builder.NewGetElementPtr(arrayType, cellMemory, constant.NewInt(types.I64, 0), builder.NewLoad(types.I64, dataPtr))
-			builder.NewCall(puts, builder.NewSExt(builder.NewLoad(types.I8, ptr), types.I32))
+			builder.NewCall(puts, builder.NewLoad(types.I8, ptr))
 		case '[':
 			ptr := builder.NewGetElementPtr(arrayType, cellMemory, constant.NewInt(types.I64, 0), builder.NewLoad(types.I64, dataPtr))
 			ld := builder.NewLoad(types.I8, ptr)
@@ -106,6 +107,11 @@ func main() {
 
 			builder.NewCondBr(cmpResult, front.Body, front.End)
 			builder = front.End
+
+		case ',':
+			char := builder.NewCall(getchar)
+			ptr := builder.NewGetElementPtr(arrayType, cellMemory, constant.NewInt(types.I64, 0), builder.NewLoad(types.I64, dataPtr))
+			builder.NewStore(char, ptr)
 		}
 	}
 
